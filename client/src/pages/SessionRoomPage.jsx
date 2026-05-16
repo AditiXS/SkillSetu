@@ -85,6 +85,14 @@ const SessionRoomPage = () => {
     };
     fetchSessionData();
   }, [id, navigate, currentUser.id]);
+  // ── Attach remote stream when UI activates ──────────────────────────────────
+  useEffect(() => {
+    if ((callState === 'active' || callState === 'calling') && remoteVideoRef.current && remoteStreamRef.current) {
+      console.log('useEffect attaching remote stream to video element');
+      remoteVideoRef.current.srcObject = remoteStreamRef.current;
+      remoteVideoRef.current.play().catch(e => console.warn('Play prevented by browser:', e));
+    }
+  }, [callState]);
 
   // ── WebRTC helpers ─────────────────────────────────────────────────────────
   const stopLocalStream = useCallback(() => {
@@ -149,9 +157,12 @@ const SessionRoomPage = () => {
     };
 
     pc.ontrack = (e) => {
+      console.log('WebRTC ontrack received:', e.track.kind);
       remoteStreamRef.current = e.streams[0];
-      if (remoteVideoRef.current) {
+      if (remoteVideoRef.current && e.streams[0]) {
+        console.log('Attaching stream to remoteVideoRef directly from ontrack');
         remoteVideoRef.current.srcObject = e.streams[0];
+        remoteVideoRef.current.play().catch(err => console.warn('Play prevented in ontrack:', err));
       }
     };
 
@@ -160,6 +171,10 @@ const SessionRoomPage = () => {
       if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
         hangUp(false);
       }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log('WebRTC ICE Connection State:', pc.iceConnectionState);
     };
 
     peerRef.current = pc;
@@ -462,6 +477,7 @@ const SessionRoomPage = () => {
                 className="sr-video-remote"
                 autoPlay
                 playsInline
+                onLoadedMetadata={(e) => e.target.play().catch(console.warn)}
               />
               {/* Local video (PiP) */}
               <video
@@ -470,6 +486,7 @@ const SessionRoomPage = () => {
                 autoPlay
                 playsInline
                 muted
+                onLoadedMetadata={(e) => e.target.play().catch(console.warn)}
               />
               {/* Camera error */}
               {camError && <div className="sr-cam-error">{camError}</div>}
