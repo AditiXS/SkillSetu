@@ -7,7 +7,15 @@ const getHeaders = () => ({
 });
 
 const handleResponse = async (res) => {
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch (err) {
+    console.error("Non-JSON response from server:", text);
+    throw new Error(`Connection error (Status ${res.status}). Please check your API URL.`);
+  }
+  
   if (!res.ok) throw new Error(data.message || 'Request failed');
   return data;
 };
