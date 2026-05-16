@@ -55,16 +55,10 @@ const api = {
 
   // Community
   getFeed: async () => handleResponse(await fetch(`${API_URL}/community/feed`, { headers: getHeaders() })),
-  postAchievement: async (formData) => {
-    const res = await fetch(`${API_URL}/community/achievements`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${getToken()}` },
-      body: formData,
-    });
-    return handleResponse(res);
-  },
+  postAchievement: async (formData) => handleResponse(await fetch(`${API_URL}/community/achievements`, { method: 'POST', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: formData })),
   deleteAchievement: async (id) => handleResponse(await fetch(`${API_URL}/community/achievements/${id}`, { method: 'DELETE', headers: getHeaders() })),
   likeAchievement: async (id) => handleResponse(await fetch(`${API_URL}/community/achievements/${id}/like`, { method: 'PUT', headers: getHeaders() })),
+  postComment: async (commentData) => handleResponse(await fetch(`${API_URL}/community/achievements/comment`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(commentData) })),
 
   getCommunities: async () => handleResponse(await fetch(`${API_URL}/community`, { headers: getHeaders() })),
   createCommunity: async (data) => handleResponse(await fetch(`${API_URL}/community`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) })),

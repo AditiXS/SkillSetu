@@ -18,6 +18,9 @@ router.delete('/achievements/:id', auth, communityController.deleteAchievement);
 // Like a post
 router.put('/achievements/:id/like', auth, communityController.likeAchievement);
 
+// Comment on a post
+router.post('/achievements/comment', auth, communityController.postComment);
+
 // Community Routes
 router.get('/', auth, communityController.getCommunities);
 router.post('/', auth, communityController.createCommunity);

@@ -11,6 +11,8 @@ const CommunityPage = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newComm, setNewComm] = useState({ name: '', description: '' });
+  const [activeReplyId, setActiveReplyId] = useState(null);
+  const [commentText, setCommentText] = useState({});
   const navigate = useNavigate();
   const currentUser = getUser();
 
@@ -86,6 +88,23 @@ const CommunityPage = () => {
     }
   };
 
+  const handleComment = async (achievementId) => {
+    const content = commentText[achievementId];
+    if (!content || !content.trim()) return;
+
+    try {
+      const res = await api.postComment({ achievementId, content });
+      setAchievements(prev => prev.map(ach => 
+        ach.id === achievementId 
+          ? { ...ach, comments: [...(ach.comments || []), res.comment] }
+          : ach
+      ));
+      setCommentText(prev => ({ ...prev, [achievementId]: '' }));
+    } catch (err) {
+      alert(err.message || 'Error posting comment');
+    }
+  };
+
   return (
     <div className="community-hub">
       <div className="community-header">
@@ -154,11 +173,41 @@ const CommunityPage = () => {
                       onClick={() => handleLike(ach.id)}
                       disabled={ach.likedBy && ach.likedBy.includes(currentUser.id)}
                     >
-                      <MessageSquare size={16}/> 
+                      <Zap size={16}/> 
                       {(ach.likedBy && ach.likedBy.includes(currentUser.id)) ? 'Celebrated' : 'Congratulate'} 
                       {ach.likesCount > 0 && <span> ({ach.likesCount})</span>}
                     </button>
+                    <button 
+                      className="feed-action-btn"
+                      onClick={() => setActiveReplyId(activeReplyId === ach.id ? null : ach.id)}
+                    >
+                      <MessageSquare size={16}/> Reply {ach.comments?.length > 0 && <span>({ach.comments.length})</span>}
+                    </button>
                   </div>
+
+                  {activeReplyId === ach.id && (
+                    <div className="feed-comments-section">
+                      <div className="comments-list">
+                        {ach.comments?.map(comment => (
+                          <div key={comment.id} className="comment-item">
+                            <div className="comment-user">
+                              <img src={(comment.user?.profilePicture?.startsWith('http') ? comment.user.profilePicture : `${import.meta.env.VITE_API_URL.replace('/api', '')}${comment.user?.profilePicture}`)} alt="" />
+                              <strong>{comment.user?.fullName}</strong>
+                            </div>
+                            <p className="comment-content">{comment.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="comment-input-row">
+                        <textarea 
+                          placeholder="Write a reply..." 
+                          value={commentText[ach.id] || ''}
+                          onChange={(e) => setCommentText({ ...commentText, [ach.id]: e.target.value })}
+                        />
+                        <button onClick={() => handleComment(ach.id)}>Post</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )) : (
                 <div className="empty-state">

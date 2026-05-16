@@ -1,5 +1,4 @@
-const Achievement = require('../models/Achievement');
-const User = require('../models/User');
+const { Achievement, User, Comment } = require('../models');
 const { uploadToCloudinary } = require('../config/cloudinary');
 
 // Fetch the global achievement feed
@@ -11,7 +10,12 @@ exports.getFeed = async (req, res) => {
         {
           model: User,
           as: 'user',
-          attributes: ['id', 'fullName', 'profilePicture', 'bio'] // Send enough info for feed cards
+          attributes: ['id', 'fullName', 'profilePicture', 'bio']
+        },
+        {
+          model: Comment,
+          as: 'comments',
+          include: [{ model: User, as: 'user', attributes: ['id', 'fullName', 'profilePicture'] }]
         }
       ]
     });
@@ -202,5 +206,29 @@ exports.createPost = async (req, res) => {
     res.json({ message: 'Post created', post });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+  }
+};
+// Post a comment on an achievement
+exports.postComment = async (req, res) => {
+  try {
+    const { achievementId, content } = req.body;
+    const userId = req.userId;
+
+    if (!content) return res.status(400).json({ message: 'Comment cannot be empty' });
+
+    const comment = await Comment.create({
+      content,
+      achievementId,
+      userId
+    });
+
+    const commentWithUser = await Comment.findByPk(comment.id, {
+      include: [{ model: User, as: 'user', attributes: ['id', 'fullName', 'profilePicture'] }]
+    });
+
+    res.status(201).json({ message: 'Comment added', comment: commentWithUser });
+  } catch (err) {
+    console.error('postComment error:', err);
+    res.status(500).json({ message: 'Error posting comment' });
   }
 };

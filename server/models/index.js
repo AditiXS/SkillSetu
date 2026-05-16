@@ -15,6 +15,7 @@ const Notification = require('./Notification');
 const Community = require('./Community');
 const CommunityMember = require('./CommunityMember');
 const CommunityPost = require('./CommunityPost');
+const Comment = require('./Comment');
 
 // --- Existing SkillSetu associations ---
 User.hasMany(Certificate, { foreignKey: 'userId', as: 'certificates' });
@@ -22,6 +23,12 @@ Certificate.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 User.hasMany(Achievement, { foreignKey: 'userId', as: 'achievements' });
 Achievement.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+// --- Achievement Comment associations ---
+Achievement.hasMany(Comment, { foreignKey: 'achievementId', as: 'comments' });
+Comment.belongsTo(Achievement, { foreignKey: 'achievementId', as: 'achievement' });
+User.hasMany(Comment, { foreignKey: 'userId', as: 'achievementComments' });
+Comment.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 // --- Skill associations ---
 User.belongsToMany(Skill, { through: UserSkill, foreignKey: 'userId', as: 'skills' });
@@ -92,6 +99,7 @@ module.exports = {
   User,
   Certificate,
   Achievement,
+  Comment,
   Skill,
   UserSkill,
   SessionRequest,
