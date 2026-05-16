@@ -157,13 +157,13 @@ const ProfilePage = () => {
   if (loading) return <div>Loading...</div>;
 
   const profileImageUrl = profile?.profilePicture 
-    ? `http://localhost:5000${profile.profilePicture}` 
+    ? (profile.profilePicture?.startsWith('http') ? profile.profilePicture : `${import.meta.env.VITE_API_URL.replace('/api', '')}${profile.profilePicture}`) 
     : 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?q=80&w=2671&auto=format&fit=crop'; // Artistic placeholder
   
   // Find featured, fallback to first cert, fallback to placeholder
   const featured = profile?.certificates?.find(c => c.isFeatured) || profile?.certificates?.[0];
   const featuredCertImageUrl = featured 
-    ? `http://localhost:5000${featured.imageUrl}`
+    ? (featured.imageUrl?.startsWith('http') ? featured.imageUrl : `${import.meta.env.VITE_API_URL.replace('/api', '')}${featured.imageUrl}`)
     : 'https://images.unsplash.com/photo-1583597089405-b0af2b9e6931?q=80&w=2670&auto=format&fit=crop'; // Artistic placeholder
 
   return (
@@ -337,7 +337,7 @@ const ProfilePage = () => {
                       </div>
                       <p className="editorial-post-text">{post.content}</p>
                       {post.imageUrl && (
-                        <img src={`http://localhost:5000${post.imageUrl}`} alt="Post visual" className="editorial-post-img" />
+                        <img src={(post.imageUrl?.startsWith('http') ? post.imageUrl : `${import.meta.env.VITE_API_URL.replace('/api', '')}${post.imageUrl}`)} alt="Post visual" className="editorial-post-img" />
                       )}
                     </div>
                   )) : (
@@ -367,7 +367,7 @@ const ProfilePage = () => {
                 <div className="editorial-cert-list">
                   {profile?.certificates?.length > 0 ? profile.certificates.map(cert => (
                     <div key={cert.id} className="editorial-cert-card">
-                      <img src={`http://localhost:5000${cert.imageUrl}`} alt={cert.title} />
+                      <img src={(cert.imageUrl?.startsWith('http') ? cert.imageUrl : `${import.meta.env.VITE_API_URL.replace('/api', '')}${cert.imageUrl}`)} alt={cert.title} />
                       <div className="cert-text">
                         <h4>{cert.title}</h4>
                         <p>{cert.issuer}</p>

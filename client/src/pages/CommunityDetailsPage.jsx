@@ -44,7 +44,7 @@ const CommunityDetailsPage = () => {
       // Wait, let's check if api has createPost. No, it doesn't.
       // I should add it or use raw fetch if specific.
       // Actually, I'll use raw fetch for community posts as it's specific to this sub-route.
-      await fetch(`http://localhost:5000/api/community/${id}/posts`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/community/${id}/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

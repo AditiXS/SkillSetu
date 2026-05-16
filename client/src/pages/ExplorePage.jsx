@@ -74,7 +74,7 @@ const ExplorePage = () => {
     const fetchMentors = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:5000/api/users/search', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/users/search`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         const data = await res.json();

@@ -12,7 +12,7 @@ const RecruiterPage = () => {
   const fetchTalent = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
-      const res = await fetch(`http://localhost:5000/api/admin/talent?${query}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/talent?${query}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.ok) {
@@ -74,7 +74,7 @@ const RecruiterPage = () => {
               </div>
               
               <div className="talent-header">
-                <img src={candidate.profilePicture ? `http://localhost:5000${candidate.profilePicture}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.fullName)}&background=000000&color=ffffff`} alt={candidate.fullName} className="talent-avatar" />
+                <img src={candidate.profilePicture ? (candidate.profilePicture?.startsWith('http') ? candidate.profilePicture : `${import.meta.env.VITE_API_URL.replace('/api', '')}${candidate.profilePicture}`) : `https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.fullName)}&background=000000&color=ffffff`} alt={candidate.fullName} className="talent-avatar" />
                 <div className="talent-info">
                   <h3>
                     {candidate.fullName}

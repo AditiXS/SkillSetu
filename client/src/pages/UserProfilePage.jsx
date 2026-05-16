@@ -91,7 +91,7 @@ const UserProfilePage = () => {
         <div className="up-hero-left">
           <div className="up-avatar-large">
             {user.profilePicture ? (
-              <img src={`http://localhost:5000${user.profilePicture}`} alt={user.fullName} />
+              <img src={(user.profilePicture?.startsWith('http') ? user.profilePicture : `${import.meta.env.VITE_API_URL.replace('/api', '')}${user.profilePicture}`)} alt={user.fullName} />
             ) : (
               <span>{initials}</span>
             )}

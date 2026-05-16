@@ -116,7 +116,7 @@ const CommunityPage = () => {
                     <div className="user-info" onClick={() => navigate(`/users/${ach.userId}`)}>
                       <div className="user-avatar">
                         {ach.user?.profilePicture ? (
-                          <img src={`http://localhost:5000${ach.user.profilePicture}`} alt="" />
+                          <img src={(ach.user.profilePicture?.startsWith('http') ? ach.user.profilePicture : `${import.meta.env.VITE_API_URL.replace('/api', '')}${ach.user.profilePicture}`)} alt="" />
                         ) : (
                           <span>{ach.user?.fullName?.[0]}</span>
                         )}
@@ -130,7 +130,7 @@ const CommunityPage = () => {
                   <p className="feed-content">{ach.content}</p>
                   {ach.imageUrl && (
                     <div className="feed-image">
-                      <img src={`http://localhost:5000${ach.imageUrl}`} alt="Achievement" />
+                      <img src={(ach.imageUrl?.startsWith('http') ? ach.imageUrl : `${import.meta.env.VITE_API_URL.replace('/api', '')}${ach.imageUrl}`)} alt="Achievement" />
                     </div>
                   )}
                   <div className="feed-footer">
