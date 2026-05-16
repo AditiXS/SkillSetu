@@ -44,8 +44,8 @@ const SessionRoomPage = () => {
   const remoteVideoRef  = useRef(null);
   const peerRef         = useRef(null);   // RTCPeerConnection
   const localStreamRef  = useRef(null);   // local MediaStream
+  const remoteStreamRef = useRef(null);
   const socketRef       = useRef(null);   // stable socket ref for WebRTC callbacks
-  const pendingCandidatesRef = useRef([]); // queue for ICE candidates that arrive early
 
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -81,6 +81,7 @@ const SessionRoomPage = () => {
   const closePeer = useCallback(() => {
     peerRef.current?.close();
     peerRef.current = null;
+    remoteStreamRef.current = null;
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
   }, []);
 
@@ -133,6 +134,7 @@ const SessionRoomPage = () => {
     };
 
     pc.ontrack = (e) => {
+      remoteStreamRef.current = e.streams[0];
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = e.streams[0];
       }
@@ -146,16 +148,6 @@ const SessionRoomPage = () => {
     };
 
     peerRef.current = pc;
-
-    // Process any queued candidates
-    if (pendingCandidatesRef.current.length > 0) {
-      console.log(`Processing ${pendingCandidatesRef.current.length} queued candidates...`);
-      pendingCandidatesRef.current.forEach(cand => {
-        pc.addIceCandidate(new RTCIceCandidate(cand)).catch(e => console.error('Error adding queued candidate:', e));
-      });
-      pendingCandidatesRef.current = [];
-    }
-
     return pc;
   }, [id, hangUp]);
 
@@ -207,6 +199,20 @@ const SessionRoomPage = () => {
       setCallState('active');
     });
 
+    const flushIceCandidates = async () => {
+      if (pendingCandidatesRef.current.length > 0) {
+        console.log(`Processing ${pendingCandidatesRef.current.length} queued candidates...`);
+        for (const cand of pendingCandidatesRef.current) {
+          try {
+            await peerRef.current.addIceCandidate(new RTCIceCandidate(cand));
+          } catch (e) {
+            console.error('Error adding queued candidate:', e);
+          }
+        }
+        pendingCandidatesRef.current = [];
+      }
+    };
+
     // Callee receives offer → creates answer
     newSocket.on('webrtc_offer', async ({ offer }) => {
       const stream = await getUserMedia();
@@ -216,6 +222,8 @@ const SessionRoomPage = () => {
 
       const pc = createPeer(stream);
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      await flushIceCandidates();
+      
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
       newSocket.emit('webrtc_answer', { sessionId: id, answer });
@@ -224,7 +232,10 @@ const SessionRoomPage = () => {
 
     // Caller receives answer
     newSocket.on('webrtc_answer', async ({ answer }) => {
-      await peerRef.current?.setRemoteDescription(new RTCSessionDescription(answer));
+      if (peerRef.current) {
+        await peerRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+        await flushIceCandidates();
+      }
     });
 
     // ICE candidates
