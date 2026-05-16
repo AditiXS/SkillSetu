@@ -420,6 +420,15 @@
   color: var(--kuro);
 }
 
+.feed-action-btn.liked {
+  color: #f04e23;
+  cursor: default;
+}
+
+.feed-action-btn:disabled {
+  cursor: default;
+}
+
 .empty-state {
   text-align: center;
   padding: 5rem 2rem;

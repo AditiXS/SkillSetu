@@ -58,16 +58,31 @@ const CommunityPage = () => {
   };
 
   const handleLike = async (achievementId) => {
+    // Prevent double-clicking if already liked in this session
+    const post = achievements.find(a => a.id === achievementId);
+    if (post && post.likedBy && post.likedBy.includes(currentUser.id)) {
+      return; // Already liked
+    }
+
     try {
       await api.likeAchievement(achievementId);
-      // Optimistic update: increment count locally
+      // Update count and likedBy list locally
       setAchievements(prev => prev.map(ach => 
         ach.id === achievementId 
-          ? { ...ach, likesCount: (ach.likesCount || 0) + 1 } 
+          ? { 
+              ...ach, 
+              likesCount: (ach.likesCount || 0) + 1,
+              likedBy: [...(ach.likedBy || []), currentUser.id]
+            } 
           : ach
       ));
     } catch (err) {
-      console.error(err);
+      if (err.response?.status === 400) {
+        // Just refresh the state if backend says already liked
+        console.warn('Already liked this post');
+      } else {
+        console.error('Error liking achievement:', err);
+      }
     }
   };
 
@@ -135,11 +150,13 @@ const CommunityPage = () => {
                   )}
                   <div className="feed-footer">
                     <button 
-                      className="feed-action-btn"
+                      className={`feed-action-btn ${(ach.likedBy && ach.likedBy.includes(currentUser.id)) ? 'liked' : ''}`}
                       onClick={() => handleLike(ach.id)}
+                      disabled={ach.likedBy && ach.likedBy.includes(currentUser.id)}
                     >
                       <MessageSquare size={16}/> 
-                      Congratulate {ach.likesCount > 0 && <span>({ach.likesCount})</span>}
+                      {(ach.likedBy && ach.likedBy.includes(currentUser.id)) ? 'Celebrated' : 'Congratulate'} 
+                      {ach.likesCount > 0 && <span> ({ach.likesCount})</span>}
                     </button>
                   </div>
                 </div>
