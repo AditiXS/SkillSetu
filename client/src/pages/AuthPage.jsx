@@ -92,6 +92,9 @@ const AuthPage = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      if (!auth) {
+        throw new Error("Google Login is not configured on this server. Please sign in with email/password.");
+      }
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
