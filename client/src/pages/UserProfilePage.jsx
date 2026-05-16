@@ -43,8 +43,12 @@ const UserProfilePage = () => {
   const handleSendRequest = async (e) => {
     e.preventDefault();
 
-    // Client-side guard: reject past dates before hitting the API
-    const selected = new Date(requestForm.scheduledDate);
+    // Safely parse "YYYY-MM-DDTHH:mm" into local timezone
+    const [datePart, timePart] = requestForm.scheduledDate.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hours, minutes] = timePart.split(':');
+    const selected = new Date(year, month - 1, day, hours, minutes);
+
     const now = new Date();
     // Strip seconds and milliseconds from both for a fair comparison
     selected.setSeconds(0, 0);
@@ -62,7 +66,7 @@ const UserProfilePage = () => {
         topic: requestForm.topic,
         description: requestForm.description,
         duration: parseInt(requestForm.duration),
-        scheduledDate: requestForm.scheduledDate,
+        scheduledDate: selected.toISOString(), // Send as strict UTC instead of local string
       });
       setMessage('Session request sent successfully!');
       setShowRequestForm(false);
