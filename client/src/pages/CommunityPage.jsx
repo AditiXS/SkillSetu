@@ -62,7 +62,7 @@ const CommunityPage = () => {
   const handleLike = async (achievementId) => {
     // Prevent double-clicking if already liked in this session
     const post = achievements.find(a => a.id === achievementId);
-    if (post && post.likedBy && post.likedBy.includes(currentUser.id)) {
+    if (post && post.likedBy && post.likedBy.some(id => String(id) === String(currentUser.id))) {
       return; // Already liked
     }
 
@@ -169,12 +169,12 @@ const CommunityPage = () => {
                   )}
                   <div className="feed-footer">
                     <button 
-                      className={`feed-action-btn ${(ach.likedBy && ach.likedBy.includes(currentUser.id)) ? 'liked' : ''}`}
+                      className={`feed-action-btn ${(ach.likedBy && ach.likedBy.some(id => String(id) === String(currentUser.id))) ? 'liked' : ''}`}
                       onClick={() => handleLike(ach.id)}
-                      disabled={ach.likedBy && ach.likedBy.includes(currentUser.id)}
+                      disabled={ach.likedBy && ach.likedBy.some(id => String(id) === String(currentUser.id))}
                     >
                       <Zap size={16}/> 
-                      {(ach.likedBy && ach.likedBy.includes(currentUser.id)) ? 'Celebrated' : 'Congratulate'} 
+                      {(ach.likedBy && ach.likedBy.some(id => String(id) === String(currentUser.id))) ? 'Celebrated' : 'Congratulate'} 
                       {ach.likesCount > 0 && <span> ({ach.likesCount})</span>}
                     </button>
                     <button 

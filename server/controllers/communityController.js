@@ -100,13 +100,18 @@ exports.likeAchievement = async (req, res) => {
       try { likers = JSON.parse(likers); } catch(e) { likers = []; }
     }
 
-    if (likers.includes(userId)) {
+    if (likers.some(l => String(l) === String(userId))) {
       return res.status(400).json({ message: 'You have already congratulated this user!' });
     }
 
-    likers.push(userId);
-    achievement.likedBy = likers;
+    // Use a new array reference to ensure Sequelize detects the change
+    const updatedLikers = [...likers, userId];
+    achievement.likedBy = updatedLikers;
     achievement.likesCount += 1;
+    
+    // Explicitly tell Sequelize that this JSON field has changed
+    achievement.changed('likedBy', true);
+    
     await achievement.save();
 
     res.status(200).json({ message: 'Celebrated!', likesCount: achievement.likesCount });
