@@ -20,6 +20,10 @@ const Achievement = sequelize.define('Achievement', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  likedBy: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

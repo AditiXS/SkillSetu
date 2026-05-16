@@ -81,9 +81,25 @@ exports.deleteAchievement = async (req, res) => {
 exports.likeAchievement = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.userId;
+
     const achievement = await Achievement.findByPk(id);
     if (!achievement) return res.status(404).json({ message: 'Achievement not found' });
 
+    // Initialize array if it somehow doesn't exist
+    let likers = achievement.likedBy || [];
+    
+    // Parse if it's a string (MySQL sometimes returns JSON as string)
+    if (typeof likers === 'string') {
+      try { likers = JSON.parse(likers); } catch(e) { likers = []; }
+    }
+
+    if (likers.includes(userId)) {
+      return res.status(400).json({ message: 'You have already congratulated this user!' });
+    }
+
+    likers.push(userId);
+    achievement.likedBy = likers;
     achievement.likesCount += 1;
     await achievement.save();
 
