@@ -1,9 +1,10 @@
 const { User, Certificate, Achievement } = require('../models');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 // Get any user's public profile
 exports.getPublicProfile = async (req, res) => {
   try {
-    const userId = req.params.id || req.userId; // fetch by ID or own profile
+    const userId = req.params.id || req.userId;
 
     const user = await User.findByPk(userId, {
       attributes: { exclude: ['password', 'resetPasswordToken', 'resetPasswordExpires'] },
@@ -29,16 +30,15 @@ exports.updateProfile = async (req, res) => {
   try {
     const { fullName, bio, skillsOffered, skillsWanted, mobileNumber, githubLink, portfolioLink } = req.body;
     
-    // Check if an image was uploaded
     let profilePictureUrl = undefined;
     if (req.file) {
-      profilePictureUrl = `/uploads/${req.file.filename}`;
+      // Upload to Cloudinary instead of saving locally
+      profilePictureUrl = await uploadToCloudinary(req.file.buffer, 'skillsetu/profiles');
     }
 
     const user = await User.findByPk(req.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Update text fields
     if (fullName) user.fullName = fullName;
     if (bio !== undefined) user.bio = bio;
     if (skillsOffered !== undefined) user.skillsOffered = skillsOffered;
@@ -46,8 +46,6 @@ exports.updateProfile = async (req, res) => {
     if (mobileNumber !== undefined) user.mobileNumber = mobileNumber;
     if (githubLink !== undefined) user.githubLink = githubLink;
     if (portfolioLink !== undefined) user.portfolioLink = portfolioLink;
-    
-    // Update image if provided
     if (profilePictureUrl) user.profilePicture = profilePictureUrl;
 
     await user.save();
@@ -84,7 +82,8 @@ exports.addCertificate = async (req, res) => {
       return res.status(400).json({ message: 'Certificate image is required.' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // Upload to Cloudinary
+    const imageUrl = await uploadToCloudinary(req.file.buffer, 'skillsetu/certificates');
 
     const certificate = await Certificate.create({
       title,
