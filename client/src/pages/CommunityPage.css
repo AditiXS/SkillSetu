@@ -389,14 +389,13 @@
   overflow: hidden;
   border: 1px solid var(--border-light);
   margin-bottom: 1.25rem;
-  background: #f9f9f9;
+  background: #fafafa;
 }
 
 .feed-image img {
   width: 100%;
+  height: auto;
   display: block;
-  max-height: 450px;
-  object-fit: contain;
 }
 
 .feed-footer {

@@ -201,9 +201,10 @@
 
 .editorial-post-img {
   width: 100%;
-  background: #eaeaea;
-  object-fit: contain;
-  max-height: 300px;
+  height: auto;
+  border-radius: 8px;
+  background: #fafafa;
+  display: block;
 }
 
 .editorial-cert-list {
