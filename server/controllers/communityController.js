@@ -1,5 +1,6 @@
 const Achievement = require('../models/Achievement');
 const User = require('../models/User');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 // Fetch the global achievement feed
 exports.getFeed = async (req, res) => {
@@ -33,7 +34,8 @@ exports.postAchievement = async (req, res) => {
 
     let imageUrl = null;
     if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+      // Upload to Cloudinary for production persistence
+      imageUrl = await uploadToCloudinary(req.file.buffer, 'skillsetu/achievements');
     }
 
     const post = await Achievement.create({
