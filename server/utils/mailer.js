@@ -2,7 +2,9 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -17,18 +19,13 @@ const transporter = nodemailer.createTransport({
  * @param {string} options.html - HTML body content
  */
 const sendMail = async ({ to, subject, html }) => {
-  try {
-    await transporter.sendMail({
-      from: `"SkillSetu" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-    });
-    console.log(`📧 Email sent to ${to}: "${subject}"`);
-  } catch (err) {
-    // Log but don't throw — email failure shouldn't break API responses
-    console.error(`❌ Failed to send email to ${to}:`, err.message);
-  }
+  await transporter.sendMail({
+    from: `"SkillSetu" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    html,
+  });
+  console.log(`📧 Email sent to ${to}: "${subject}"`);
 };
 
 // ─── Email Templates ────────────────────────────────────────────────────────
