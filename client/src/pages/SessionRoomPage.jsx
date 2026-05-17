@@ -12,10 +12,10 @@ import './SessionRoomPage.css';
 const RTC_CONFIG = {
   iceTransportPolicy: 'all', // try direct first, fall back to TURN
   iceServers: [
-    // Google STUN servers (free, always available)
+    // Google, Cloudflare, and Twilio STUN servers (highly reliable in India)
     { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun.cloudflare.com:3478' },
+    { urls: 'stun:global.stun.twilio.com:3478' },
     // OpenRelay Project Free TURN Servers (maintained for robust cross-network WebRTC)
     {
       urls: 'turn:openrelay.metered.ca:80',
@@ -190,8 +190,9 @@ const SessionRoomPage = () => {
 
     pc.onconnectionstatechange = () => {
       console.log('WebRTC Connection State:', pc.connectionState);
-      if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
-        console.warn('WebRTC connection failed or disconnected. Hanging up.');
+      // 'disconnected' can be temporary (network switch). Only hang up on hard 'failed' or 'closed'.
+      if (['failed', 'closed'].includes(pc.connectionState)) {
+        console.warn('WebRTC connection failed. Hanging up.');
         hangUp(false);
       }
     };
