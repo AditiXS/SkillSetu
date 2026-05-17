@@ -60,12 +60,33 @@ const verifyUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  const sequelize = require('../config/database');
+  const userId = req.params.id;
   try {
-    await User.destroy({ where: { id: req.params.id } });
-    res.json({ message: 'User deleted' });
+    // Temporarily disable FK checks, delete all related data, then re-enable
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    await sequelize.query(`DELETE FROM messages WHERE senderId = ${userId}`);
+    await sequelize.query(`DELETE FROM ratings WHERE raterId = ${userId} OR ratedUserId = ${userId}`);
+    await sequelize.query(`DELETE FROM messages WHERE sessionId IN (SELECT id FROM sessions WHERE mentorId = ${userId} OR learnerId = ${userId})`);
+    await sequelize.query(`DELETE FROM sessions WHERE mentorId = ${userId} OR learnerId = ${userId}`);
+    await sequelize.query(`DELETE FROM session_requests WHERE senderId = ${userId} OR receiverId = ${userId}`);
+    await sequelize.query(`DELETE FROM comments WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM community_posts WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM community_members WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM notifications WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM user_badges WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM transactions WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM wallets WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM user_skills WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM achievements WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM certificates WHERE userId = ${userId}`);
+    await sequelize.query(`DELETE FROM users WHERE id = ${userId}`);
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    res.json({ message: 'User and all related data deleted successfully.' });
   } catch (error) {
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1').catch(() => {});
     console.error('DeleteUser error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error during user deletion.' });
   }
 };
 
