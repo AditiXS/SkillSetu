@@ -88,6 +88,8 @@ const templates = {
       <div style="text-align: center; margin: 30px 0;">
         <a href="${resetUrl}" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: bold; display: inline-block;">Reset Password →</a>
       </div>
+      <p style="font-size: 13px; color: #aaa;">If the button above doesn't work, copy and paste this link into your browser:</p>
+      <p style="font-size: 12px; background: #0f0f1a; padding: 12px; border-radius: 6px; word-break: break-all; color: #667eea;">${resetUrl}</p>
       <p style="font-size: 13px; color: #888;">This link expires in <strong>1 hour</strong>. If you didn't request this, you can safely ignore this email.</p>
     `),
   }),
