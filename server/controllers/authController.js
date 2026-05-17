@@ -235,7 +235,8 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000;
     await user.save();
 
-    const resetUrl = `${process.env.FRONTEND_URL}/auth?reset=${resetToken}`;
+    const baseUrl = process.env.FRONTEND_URL.trim().replace(/\/$/, '');
+    const resetUrl = `${baseUrl}/auth?reset=${resetToken}`;
     const resetEmail = templates.passwordReset(resetUrl);
     await sendMail({ to: user.email, ...resetEmail });
 
