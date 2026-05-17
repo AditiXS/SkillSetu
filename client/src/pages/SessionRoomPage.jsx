@@ -16,26 +16,27 @@ const RTC_CONFIG = {
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun.cloudflare.com:3478' },
     { urls: 'stun:global.stun.twilio.com:3478' },
-    // OpenRelay Project Free TURN Servers (maintained for robust cross-network WebRTC)
+    // Personal Metered TURN/STUN servers
+    { urls: 'stun:stun.relay.metered.ca:80' },
     {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turn:global.relay.metered.ca:80',
+      username: '33f9a803cfb89ab879d7194c',
+      credential: 'il/VpAg9AmK1M2FW',
     },
     {
-      urls: 'turn:openrelay.metered.ca:80?transport=tcp',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turn:global.relay.metered.ca:80?transport=tcp',
+      username: '33f9a803cfb89ab879d7194c',
+      credential: 'il/VpAg9AmK1M2FW',
     },
     {
-      urls: 'turn:openrelay.metered.ca:443',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turn:global.relay.metered.ca:443',
+      username: '33f9a803cfb89ab879d7194c',
+      credential: 'il/VpAg9AmK1M2FW',
     },
     {
-      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
+      urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+      username: '33f9a803cfb89ab879d7194c',
+      credential: 'il/VpAg9AmK1M2FW',
     },
   ],
 };
