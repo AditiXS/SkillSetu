@@ -168,7 +168,7 @@ const acceptRequest = async (req, res) => {
     await Message.create({
       sessionId: session.id,
       senderId: request.receiverId,
-      content: `Session created! Topic: ${request.topic}. Scheduled for ${new Date(request.scheduledDate).toLocaleString()}. Duration: ${request.duration} minutes.`,
+      content: `Session created! Topic: ${request.topic}. Scheduled for ${new Date(request.scheduledDate).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}. Duration: ${request.duration} minutes.`,
       type: 'system',
     });
 
