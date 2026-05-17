@@ -404,8 +404,8 @@ const SessionRoomPage = () => {
   if (loading) return <div className="sr-loading"><div className="sr-spinner"></div></div>;
   if (!session) return null;
 
-  const partner = session.mentorId === currentUser.id ? session.learner : session.mentor;
-  const isMentor = session.mentorId === currentUser.id;
+  const isMentor = Number(session.mentorId) === Number(currentUser.id);
+  const partner = isMentor ? session.learner : session.mentor;
   const isActive = session.status === 'active';
 
   return (
