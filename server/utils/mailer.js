@@ -1,15 +1,8 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// Initialize Resend with the provided API key
+const resend = new Resend('re_bjRkunkk_B8fYHjnCq4qyP3Mo3xvmCX81');
 
 /**
  * Send an email using the SkillSetu transporter.
@@ -20,13 +13,13 @@ const transporter = nodemailer.createTransport({
  */
 const sendMail = async ({ to, subject, html }) => {
   try {
-    await transporter.sendMail({
-      from: `"SkillSetu" <${process.env.EMAIL_USER}>`,
-      to,
+    const data = await resend.emails.send({
+      from: 'SkillSetu <onboarding@resend.dev>', // Free tier Resend requires sending from this testing email
+      to: [to],
       subject,
       html,
     });
-    console.log(`📧 Email sent to ${to}: "${subject}"`);
+    console.log(`📧 Email sent to ${to}: "${subject}"`, data);
   } catch (error) {
     console.error(`❌ Failed to send email to ${to}: "${subject}"`, error);
   }
