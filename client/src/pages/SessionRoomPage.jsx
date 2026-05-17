@@ -167,17 +167,30 @@ const SessionRoomPage = () => {
 
     pc.ontrack = (e) => {
       console.log('WebRTC ontrack received:', e.track.kind);
-      remoteStreamRef.current = e.streams[0];
-      if (remoteVideoRef.current && e.streams[0]) {
-        console.log('Attaching stream to remoteVideoRef directly from ontrack');
-        remoteVideoRef.current.srcObject = e.streams[0];
+      
+      // Some browsers don't populate e.streams, so we manually build the stream
+      if (!remoteStreamRef.current) {
+        remoteStreamRef.current = new MediaStream();
+      }
+      remoteStreamRef.current.addTrack(e.track);
+
+      // Force attachment if the video element is ready
+      if (remoteVideoRef.current) {
+        if (remoteVideoRef.current.srcObject !== remoteStreamRef.current) {
+          console.log('Attaching newly constructed remote stream to video element');
+          remoteVideoRef.current.srcObject = remoteStreamRef.current;
+        }
         remoteVideoRef.current.play().catch(err => console.warn('Play prevented in ontrack:', err));
       }
+      
+      // Also trigger a state update just to force React to re-evaluate the video tag
+      setCallState(prev => prev);
     };
 
     pc.onconnectionstatechange = () => {
       console.log('WebRTC Connection State:', pc.connectionState);
       if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
+        console.warn('WebRTC connection failed or disconnected. Hanging up.');
         hangUp(false);
       }
     };
