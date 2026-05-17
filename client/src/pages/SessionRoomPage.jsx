@@ -70,6 +70,7 @@ const SessionRoomPage = () => {
   const localStreamRef  = useRef(null);   // local MediaStream
   const remoteStreamRef = useRef(null);
   const socketRef       = useRef(null);   // stable socket ref for WebRTC callbacks
+  const pendingCandidatesRef = useRef([]); // queue for ICE candidates before remote description is set
 
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
