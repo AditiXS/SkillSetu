@@ -1,11 +1,7 @@
 require('dotenv').config();
-const { Resend } = require('resend');
-
-// Initialize Resend with the provided API key
-const resend = new Resend('re_bjRkunkk_B8fYHjnCq4qyP3Mo3xvmCX81');
 
 /**
- * Send an email using the SkillSetu transporter.
+ * Send an email using the SkillSetu transporter (via Brevo REST API).
  * @param {Object} options
  * @param {string} options.to - Recipient email address
  * @param {string} options.subject - Email subject
@@ -13,12 +9,30 @@ const resend = new Resend('re_bjRkunkk_B8fYHjnCq4qyP3Mo3xvmCX81');
  */
 const sendMail = async ({ to, subject, html }) => {
   try {
-    const data = await resend.emails.send({
-      from: 'SkillSetu <onboarding@resend.dev>', // Free tier Resend requires sending from this testing email
-      to: [to],
-      subject,
-      html,
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: {
+          name: 'SkillSetu',
+          email: process.env.EMAIL_USER // This MUST be the email you verified on Brevo
+        },
+        to: [{ email: to }],
+        subject: subject,
+        htmlContent: html
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(JSON.stringify(errorData));
+    }
+    
+    const data = await response.json();
     console.log(`📧 Email sent to ${to}: "${subject}"`, data);
   } catch (error) {
     console.error(`❌ Failed to send email to ${to}: "${subject}"`, error);
