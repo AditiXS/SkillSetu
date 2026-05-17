@@ -3,8 +3,8 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // Use SSL
+  port: 587,
+  secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -19,13 +19,17 @@ const transporter = nodemailer.createTransport({
  * @param {string} options.html - HTML body content
  */
 const sendMail = async ({ to, subject, html }) => {
-  await transporter.sendMail({
-    from: `"SkillSetu" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    html,
-  });
-  console.log(`📧 Email sent to ${to}: "${subject}"`);
+  try {
+    await transporter.sendMail({
+      from: `"SkillSetu" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+    });
+    console.log(`📧 Email sent to ${to}: "${subject}"`);
+  } catch (error) {
+    console.error(`❌ Failed to send email to ${to}: "${subject}"`, error);
+  }
 };
 
 // ─── Email Templates ────────────────────────────────────────────────────────
