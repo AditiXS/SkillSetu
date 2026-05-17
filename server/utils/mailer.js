@@ -19,11 +19,14 @@ const sendMail = async ({ to, subject, html }) => {
       body: JSON.stringify({
         sender: {
           name: 'SkillSetu',
-          email: process.env.EMAIL_USER // This MUST be the email you verified on Brevo
+          email: process.env.EMAIL_USER
         },
         to: [{ email: to }],
         subject: subject,
-        htmlContent: html
+        htmlContent: html,
+        headers: {
+          'X-Mailin-custom': 'trackclicks=0'
+        }
       })
     });
 
