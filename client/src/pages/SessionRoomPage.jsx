@@ -16,26 +16,26 @@ const RTC_CONFIG = {
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
-    // Metered free TURN servers (reliable, no sign-up needed for basic use)
+    // OpenRelay Project Free TURN Servers (maintained for robust cross-network WebRTC)
     {
-      urls: 'turn:a.relay.metered.ca:80',
-      username: 'e8dd9a9c9b40c0be0b647a2a',
-      credential: 'uMBWXks3OOWKZ4Iz',
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
     {
-      urls: 'turn:a.relay.metered.ca:80?transport=tcp',
-      username: 'e8dd9a9c9b40c0be0b647a2a',
-      credential: 'uMBWXks3OOWKZ4Iz',
+      urls: 'turn:openrelay.metered.ca:80?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
     {
-      urls: 'turn:a.relay.metered.ca:443',
-      username: 'e8dd9a9c9b40c0be0b647a2a',
-      credential: 'uMBWXks3OOWKZ4Iz',
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
     {
-      urls: 'turn:a.relay.metered.ca:443?transport=tcp',
-      username: 'e8dd9a9c9b40c0be0b647a2a',
-      credential: 'uMBWXks3OOWKZ4Iz',
+      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
   ],
 };
